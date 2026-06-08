@@ -1,0 +1,14 @@
+{
+  "name": "wp-chatbot",
+  "version": "1.0.0",
+  "description": "Embeddable AI chatbot for WordPress — DraftSight SA & Simutron",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "@supabase/supabase-js": "^2.43.0",
+    "mammoth": "^1.7.0",
+    "pdf-parse": "^1.1.1"
+  }
+}

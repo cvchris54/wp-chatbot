@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot Admin — Knowledge Base Manager</title>
+<style>
+  :root {
+    --draftsight: #0066B3;
+    --simutron:   #E8500A;
+    --bg:         #f4f6f9;
+    --surface:    #ffffff;
+    --border:     #e2e6ea;
+    --text:       #1a1a2e;
+    --muted:      #6c757d;
+    --danger:     #dc3545;
+    --success:    #28a745;
+    --radius:     10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-radius: var(--radius); }
+  header h1 { font-size: 20px; font-weight: 700; }
+  header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Login ── */
+  #login-screen { background: var(--surface); border-radius: var(--radius); padding: 32px; max-width: 420px; margin: 60px auto; box-shadow: 0 2px 16px rgba(0,0,0,.07); }
+  #login-screen h2 { font-size: 18px; margin-bottom: 6px; }
+  #login-screen p  { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+  /* ── Card ── */
+  .card { background: var(--surface); border-radius: var(--radius); padding: 24px; border: 1px solid var(--border); margin-bottom: 20px; }
+  .card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .card-sub   { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab  { padding: 8px 20px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface); cursor: pointer; font-size: 14px; font-weight: 500; color: var(--muted); transition: all .2s; }
+  .tab.active[data-bot="draftsight"] { background: var(--draftsight); border-color: var(--draftsight); color: #fff; }
+  .tab.active[data-bot="simutron"]   { background: var(--simutron);   border-color: var(--simutron);   color: #fff; }
+  .tab:hover:not(.active) { border-color: #aaa; color: var(--text); }
+
+  /* ── Drop zone ── */
+  #drop-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 36px 24px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s; background: #fafbfc;
+    margin-bottom: 16px;
+  }
+  #drop-zone.over { border-color: var(--draftsight); background: #f0f6ff; }
+  #drop-zone p    { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  #drop-zone strong { font-size: 15px; color: var(--text); }
+  #file-input { display: none; }
+
+  /* ── Progress ── */
+  #progress-wrap { display: none; margin-bottom: 16px; }
+  #progress-bar  { height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
+  #progress-fill { height: 100%; background: var(--draftsight); width: 0; transition: width .3s; border-radius: 3px; }
+  #progress-label { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+  /* ── Status ── */
+  .status { padding: 10px 14px; border-radius: 7px; font-size: 13px; margin-bottom: 14px; display: none; }
+  .status.ok  { background: #d4edda; color: #155724; }
+  .status.err { background: #f8d7da; color: #721c24; }
+
+  /* ── Forms ── */
+  label   { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+  input, select {
+    width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+    border-radius: 7px; font-size: 14px; outline: none;
+    transition: border-color .2s; background: #fff;
+  }
+  input:focus, select:focus { border-color: var(--draftsight); }
+  .form-group { margin-bottom: 16px; }
+
+  /* ── Buttons ── */
+  .btn { padding: 9px 20px; border-radius: 7px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: opacity .2s; }
+  .btn-primary   { background: var(--draftsight); color: #fff; }
+  .btn-simutron  { background: var(--simutron);   color: #fff; }
+  .btn-danger    { background: var(--danger);      color: #fff; font-size: 12px; padding: 5px 12px; }
+  .btn:disabled  { opacity: .5; cursor: not-allowed; }
+  .btn:hover:not(:disabled) { opacity: .88; }
+  .btn-full { width: 100%; }
+
+  /* ── Docs table ── */
+  .docs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .docs-count  { font-size: 13px; color: var(--muted); }
+  .doc-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: 7px; margin-bottom: 8px; background: #fafbfc;
+    animation: fadein .2s ease;
+  }
+  @keyframes fadein { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+  .doc-icon  { font-size: 20px; }
+  .doc-info  { flex: 1; min-width: 0; }
+  .doc-name  { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-meta  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .empty-docs { text-align: center; color: var(--muted); font-size: 14px; padding: 32px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .page { padding: 16px 12px 32px; }
+    header { flex-direction: column; align-items: flex-start; }
+    .tabs  { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <h2>🤖 Chatbot Admin</h2>
+  <p>Enter your Vercel API URL and admin key to manage knowledge bases.</p>
+
+  <div class="form-group">
+    <label for="inp-api-url">Vercel API URL</label>
+    <input id="inp-api-url" type="url" placeholder="https://your-app.vercel.app">
+  </div>
+  <div class="form-group">
+    <label for="inp-admin-key">Admin Key</label>
+    <input id="inp-admin-key" type="password" placeholder="Your ADMIN_API_KEY">
+  </div>
+  <div class="status" id="login-status"></div>
+  <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MAIN APP (hidden until logged in)
+════════════════════════════════════════════════════════════════════════ -->
+<div id="app" style="display:none">
+<div class="page">
+
+  <header>
+    <div style="font-size:28px">🤖</div>
+    <div>
+      <h1>Chatbot Knowledge Base Manager</h1>
+      <p>Upload documents, PDFs, images, and spreadsheets to train each chatbot.</p>
+    </div>
+    <button class="btn" style="margin-left:auto;background:#f0f2f5" onclick="doLogout()">Sign Out</button>
+  </header>
+
+  <!-- ── Bot selector tabs ── -->
+  <div class="tabs">
+    <button class="tab active" data-bot="draftsight" onclick="switchBot('draftsight')">🔵 DraftSight SA</button>
+    <button class="tab"        data-bot="simutron"   onclick="switchBot('simutron')">🟠 Simutron</button>
+  </div>
+
+  <!-- ── Upload card ── -->
+  <div class="card">
+    <div class="card-title">Upload Documents</div>
+    <div class="card-sub" id="upload-sub">Accepted: PDF, DOCX, TXT, MD, CSV, PNG, JPG, GIF, WEBP — max 10 MB each</div>
+
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div style="font-size:36px">📂</div>
+      <strong>Click to browse or drag & drop files here</strong>
+      <p>Multiple files can be selected at once</p>
+    </div>
+    <input type="file" id="file-input" multiple
+           accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.gif,.webp">
+
+    <div id="progress-wrap">
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="progress-label">Preparing…</div>
+    </div>
+
+    <div class="status" id="upload-status"></div>
+  </div>
+
+  <!-- ── Documents list card ── -->
+  <div class="card">
+    <div class="docs-header">
+      <div>
+        <div class="card-title">Knowledge Base</div>
+        <div class="docs-count" id="docs-count">Loading…</div>
+      </div>
+      <button class="btn" style="background:#f0f2f5" onclick="loadDocs()">↻ Refresh</button>
+    </div>
+    <div id="docs-list"></div>
+  </div>
+
+</div><!-- /.page -->
+</div><!-- /#app -->
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────
+var API_URL   = '';
+var ADMIN_KEY = '';
+var CURRENT_BOT = 'draftsight';
+
+var BOT_LABELS = {
+  draftsight: 'DraftSight SA',
+  simutron:   'Simutron',
+};
+var BOT_COLORS = {
+  draftsight: '#0066B3',
+  simutron:   '#E8500A',
+};
+
+// ── Auth ─────────────────────────────────────────────────────────────────
+function doLogin() {
+  var url = document.getElementById('inp-api-url').value.trim().replace(/\/$/, '');
+  var key = document.getElementById('inp-admin-key').value.trim();
+
+  if (!url || !key) { showStatus('login-status', 'err', 'Both fields are required.'); return; }
+
+  showStatus('login-status', 'ok', 'Connecting…');
+
+  // Test the connection by fetching documents
+  fetch(url + '/api/documents?botId=draftsight&adminKey=' + encodeURIComponent(key))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) throw new Error(d.error);
+      API_URL   = url;
+      ADMIN_KEY = key;
+      localStorage.setItem('cb_api', url);
+      localStorage.setItem('cb_key', key);
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      loadDocs();
+    })
+    .catch(function(e) { showStatus('login-status', 'err', 'Connection failed: ' + e.message); });
+}
+
+function doLogout() {
+  localStorage.removeItem('cb_api');
+  localStorage.removeItem('cb_key');
+  API_URL = ''; ADMIN_KEY = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+}
+
+// Auto-login from localStorage
+(function() {
+  var url = localStorage.getItem('cb_api');
+  var key = localStorage.getItem('cb_key');
+  if (url && key) {
+    document.getElementById('inp-api-url').value = url;
+    document.getElementById('inp-admin-key').value = key;
+    API_URL = url; ADMIN_KEY = key;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadDocs();
+  }
+})();
+
+// ── Bot switcher ─────────────────────────────────────────────────────────
+function switchBot(botId) {
+  CURRENT_BOT = botId;
+  document.querySelectorAll('.tab').forEach(function(t) {
+    t.classList.toggle('active', t.dataset.bot === botId);
+  });
+  loadDocs();
+}
+
+// ── Load documents ────────────────────────────────────────────────────────
+function loadDocs() {
+  var list  = document.getElementById('docs-list');
+  var count = document.getElementById('docs-count');
+  list.innerHTML = '<div class="empty-docs">Loading…</div>';
+
+  fetch(API_URL + '/api/documents?botId=' + CURRENT_BOT + '&adminKey=' + encodeURIComponent(ADMIN_KEY))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error);
+      var docs = data.documents || [];
+      count.textContent = docs.length + ' document' + (docs.length !== 1 ? 's' : '') + ' — ' + BOT_LABELS[CURRENT_BOT];
+
+      if (docs.length === 0) {
+        list.innerHTML = '<div class="empty-docs">No documents uploaded yet. Upload your first document above ↑</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      docs.forEach(function(doc) {
+        var ext  = (doc.source.split('.').pop() || '').toLowerCase();
+        var icon = { pdf:'📄', docx:'📝', doc:'📝', txt:'📃', md:'📃', csv:'📊', json:'📋', png:'🖼️', jpg:'🖼️', jpeg:'🖼️', gif:'🖼️', webp:'🖼️' }[ext] || '📁';
+        var date = doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : '';
+
+        var row = document.createElement('div');
+        row.className = 'doc-row';
+        row.innerHTML = [
+          '<span class="doc-icon">' + icon + '</span>',
+          '<div class="doc-info">',
+            '<div class="doc-name" title="' + esc(doc.source) + '">' + esc(doc.source) + '</div>',
+            '<div class="doc-meta">' + doc.chunks + ' chunk' + (doc.chunks !== 1 ? 's' : '') + (date ? ' · ' + date : '') + '</div>',
+          '</div>',
+          '<button class="btn btn-danger" onclick="deleteDoc(' + JSON.stringify(doc.source) + ')">Delete</button>',
+        ].join('');
+        list.appendChild(row);
+      });
+    })
+    .catch(function(e) {
+      list.innerHTML = '<div class="empty-docs" style="color:#dc3545">Error: ' + esc(e.message) + '</div>';
+    });
+}
+
+// ── Delete document ───────────────────────────────────────────────────────
+function deleteDoc(source) {
+  if (!confirm('Delete "' + source + '" from the ' + BOT_LABELS[CURRENT_BOT] + ' knowledge base?')) return;
+
+  fetch(API_URL + '/api/documents', {
+    method:  'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ botId: CURRENT_BOT, adminKey: ADMIN_KEY, source: source }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.error) throw new Error(d.error);
+    loadDocs();
+  })
+  .catch(function(e) { alert('Delete failed: ' + e.message); });
+}
+
+// ── File upload ───────────────────────────────────────────────────────────
+var dropZone = document.getElementById('drop-zone');
+
+dropZone.addEventListener('dragover',  function(e) { e.preventDefault(); this.classList.add('over'); });
+dropZone.addEventListener('dragleave', function()  { this.classList.remove('over'); });
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault(); this.classList.remove('over');
+  uploadFiles(Array.from(e.dataTransfer.files));
+});
+
+document.getElementById('file-input').addEventListener('change', function() {
+  uploadFiles(Array.from(this.files));
+  this.value = '';
+});
+
+async function uploadFiles(files) {
+  if (!files.length) return;
+
+  var pw   = document.getElementById('progress-wrap');
+  var fill = document.getElementById('progress-fill');
+  var lbl  = document.getElementById('progress-label');
+  var st   = document.getElementById('upload-status');
+
+  pw.style.display = 'block';
+  st.style.display = 'none';
+
+  var errors   = [];
+  var successes = [];
+
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    lbl.textContent = 'Processing ' + (i + 1) + ' of ' + files.length + ': ' + file.name + '…';
+    fill.style.width = Math.round(((i) / files.length) * 100) + '%';
+
+    try {
+      var b64 = await readFileAsBase64(file);
+      var res = await fetch(API_URL + '/api/ingest', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          botId:    CURRENT_BOT,
+          adminKey: ADMIN_KEY,
+          fileName: file.name,
+          fileType: file.type || 'application/octet-stream',
+          fileData: b64,
+        }),
+      });
+      var data = await res.json();
+      if (data.error) throw new Error(data.error);
+      successes.push(file.name + ' (' + data.chunks + ' chunks)');
+    } catch (e) {
+      errors.push(file.name + ': ' + e.message);
+    }
+  }
+
+  fill.style.width = '100%';
+  lbl.textContent  = 'Done.';
+  setTimeout(function() { pw.style.display = 'none'; fill.style.width = '0'; }, 1200);
+
+  if (successes.length) {
+    showStatus('upload-status', 'ok', '✓ Uploaded: ' + successes.join(', '));
+    loadDocs();
+  }
+  if (errors.length) {
+    showStatus('upload-status', 'err', '✗ Errors: ' + errors.join(' | '));
+  }
+}
+
+function readFileAsBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var r = new FileReader();
+    r.onload  = function() { resolve(r.result.split(',')[1]); };
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function showStatus(id, type, msg) {
+  var el = document.getElementById(id);
+  el.className = 'status ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  if (type === 'ok') setTimeout(function() { el.style.display = 'none'; }, 5000);
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Allow pressing Enter to login
+document.getElementById('inp-admin-key').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
