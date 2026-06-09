@@ -8,7 +8,8 @@
   var TITLE     = cfg.title          || 'Chat Assistant';
   var WELCOME   = cfg.welcomeMessage || 'Hi! How can I help you today?';
   var POSITION  = cfg.position === 'left' ? 'left' : 'right';
-  var W         = WIDGET_ID = 'cb_' + BOT_ID;
+  var WIDGET_ID = 'cb_' + BOT_ID;
+  var W         = WIDGET_ID;
 
   if (!API_URL) { console.warn('[Chatbot] apiUrl required'); return; }
   if (document.getElementById(W + '_wrap')) return;
@@ -40,7 +41,7 @@
     msgsS:   '#'+W+'_msgs::-webkit-scrollbar{width:4px}#'+W+'_msgs::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}',
 
     /* Bot bubble: fit-content so it never stretches wider than its text */
-    msgB:    '.cb_b{width:fit-content;max-width:82%;padding:13px 18px;border-radius:14px 14px 14px 3px;background:#f0f2f5;color:#1a1a1a;font-size:14px;line-height:1.65;word-break:break-word;animation:cbf .18s ease}',
+    msgB:    '.cb_b{width:fit-content;max-width:82%;padding:13px 18px;border-radius:14px 14px 14px 3px;background:#f0f2f5;color:#1a1a1a;font-size:14px;line-height:1.65;word-break:break-word;align-self:flex-start;animation:cbf .18s ease}',
     /* User bubble */
     msgU:    '.cb_u{width:fit-content;max-width:72%;padding:11px 16px;border-radius:14px 14px 3px 14px;background:'+PRIMARY+';color:#fff;font-size:14px;line-height:1.55;word-break:break-word;align-self:flex-end;animation:cbf .18s ease}',
 
@@ -70,7 +71,7 @@
   };
 
   var style = document.createElement('style');
-  style.textContent = Object.values(S).join('');
+  var _css=''; for(var _k in S){ _css+=S[_k]; } style.textContent=_css;
   document.head.appendChild(style);
 
   /* ── DOM ────────────────────────────────────────────────────────────── */
