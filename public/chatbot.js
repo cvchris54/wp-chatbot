@@ -57,12 +57,12 @@
     '#' + WIDGET_ID + '_close{background:none;border:none;color:#fff;cursor:pointer;padding:4px;opacity:.8;display:flex}',
     '#' + WIDGET_ID + '_close:hover{opacity:1}',
 
-    '#' + WIDGET_ID + '_msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}',
+    '#' + WIDGET_ID + '_msgs{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}',
     '#' + WIDGET_ID + '_msgs::-webkit-scrollbar{width:4px}',
     '#' + WIDGET_ID + '_msgs::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}',
 
     /* Message bubbles — generous padding, no clipping */
-    '.cb_msg{max-width:88%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6;word-break:break-word;overflow-wrap:break-word;animation:cb_fadein .18s ease}',
+    '.cb_msg{max-width:86%;padding:14px 20px;border-radius:14px;font-size:14px;line-height:1.6;word-break:break-word;overflow-wrap:break-word;animation:cb_fadein .18s ease}',
     '.cb_msg.bot{background:#f0f2f5;color:#1a1a1a;align-self:flex-start;border-bottom-left-radius:3px}',
     '.cb_msg.user{background:' + PRIMARY + ';color:#fff;align-self:flex-end;border-bottom-right-radius:3px}',
 
@@ -71,7 +71,7 @@
     '.cb_msg.bot p:last-child{margin-bottom:0}',
     '.cb_msg.bot strong{font-weight:600;color:#111}',
     '.cb_msg.bot em{font-style:italic}',
-    '.cb_msg.bot ol,.cb_msg.bot ul{margin:6px 0 8px 0;padding-left:22px}',
+    '.cb_msg.bot ol,.cb_msg.bot ul{margin:6px 0 8px 0;padding-left:20px;padding-right:4px}',
     '.cb_msg.bot ol:last-child,.cb_msg.bot ul:last-child{margin-bottom:0}',
     '.cb_msg.bot li{margin:4px 0;line-height:1.5}',
     '.cb_msg.bot h3,.cb_msg.bot h4{font-size:14px;font-weight:600;margin:8px 0 4px;color:#111}',
