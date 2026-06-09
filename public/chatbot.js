@@ -19,7 +19,7 @@
 
   /* ── Styles ─────────────────────────────────────────────────────────── */
   var S = {
-    wrap:    '#'+W+'_wrap *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;padding:0}',
+    wrap:    '#'+W+'_wrap *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0}',
     btn:     '#'+W+'_btn{position:fixed;'+POS+';bottom:20px;width:56px;height:56px;border-radius:50%;background:'+PRIMARY+';border:none;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.22);z-index:2147483646;display:flex;align-items:center;justify-content:center;transition:transform .2s}',
     btnH:    '#'+W+'_btn:hover{transform:scale(1.08)}',
     btnSvg:  '#'+W+'_btn svg{width:26px;height:26px;fill:#fff}',
@@ -41,7 +41,7 @@
     msgsS:   '#'+W+'_msgs::-webkit-scrollbar{width:4px}#'+W+'_msgs::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}',
 
     /* Bot bubble: fit-content so it never stretches wider than its text */
-    msgB:    '.cb_b{width:fit-content;max-width:82%;padding:13px 18px;border-radius:14px 14px 14px 3px;background:#f0f2f5;color:#1a1a1a;font-size:14px;line-height:1.65;word-break:break-word;align-self:flex-start;animation:cbf .18s ease}',
+    msgB:    '.cb_b{width:fit-content;max-width:78%;padding:14px 22px;border-radius:14px 14px 14px 3px;background:#f0f2f5;color:#1a1a1a;font-size:14px;line-height:1.65;word-break:break-word;align-self:flex-start;animation:cbf .18s ease}',
     /* User bubble */
     msgU:    '.cb_u{width:fit-content;max-width:72%;padding:11px 16px;border-radius:14px 14px 3px 14px;background:'+PRIMARY+';color:#fff;font-size:14px;line-height:1.55;word-break:break-word;align-self:flex-end;animation:cbf .18s ease}',
 
