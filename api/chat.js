@@ -10,9 +10,9 @@ const BOT_CONFIGS = {
   },
   simutron: {
     company:     'Simutron',
-    description: 'a South African reseller of Altair simulation, HPC, and AI-driven engineering software',
+    description: 'a South African reseller of Simcenter simulation, HPC, and AI-driven engineering software',
     website:     'https://simutron.co.za',
-    products:    'Altair simulation tools, HPC solutions, and units-based licensing',
+    products:    'Simcenter simulation tools and HPC solutions',
   },
 };
 
